@@ -367,43 +367,25 @@ def align(
                 segment['end'] = t2_actual
                 prev_t2 = segment['end']
 
-                # for the .ass output
-                for x in range(len(t_local)):
-                    curr_word = t_words[x]
-                    curr_timestamp = t_local[x]
-                    if curr_timestamp is not None:
-                        segment['word-level'].append({"text": curr_word, "start": curr_timestamp[0], "end": curr_timestamp[1]})
-                    else:
-                        segment['word-level'].append({"text": curr_word, "start": None, "end": None})
-
-                # for per-word .srt ouput
-                # merge missing words to previous, or merge with next word ahead if idx == 0
                 found_first_ts = False
                 for x in range(len(t_local)):
                     curr_word = t_words[x]
                     curr_timestamp = t_local[x]
                     if curr_timestamp is not None:
-                        word_segments_list.append({"text": curr_word, "start": curr_timestamp[0], "end": curr_timestamp[1]})
+                        segment['word-level'].append({"text": curr_word, "start": curr_timestamp[0], "end": curr_timestamp[1]})
                         found_first_ts = True
                     elif not drop_non_aligned_words:
-                        # then we merge
                         if not found_first_ts:
                             t_words[x+1] = " ".join([curr_word, t_words[x+1]])
                         else:
-                            word_segments_list[-1]['text'] += ' ' + curr_word
+                            segment['word-level'][-1]['text'] += ' ' + curr_word
         else:
             fail_fallback = True
 
         if fail_fallback:
-            # then we resort back to original whisper timestamps
-            # segment['start] and segment['end'] are unchanged
             prev_t2 = 0
-            segment['word-level'].append({"text": segment['text'], "start": segment['start'], "end":segment['end']})
-            word_segments_list.append({"text": segment['text'], "start": segment['start'], "end":segment['end']})
 
-        print(f"[{format_timestamp(segment['start'])} --> {format_timestamp(segment['end'])}] {segment['text']}")
-
-    return {"segments": transcript, "word_segments": word_segments_list}
+    return {"segments": transcript}
 
 def load_align_model(language_code, device, model_name=None):
     if model_name is None:
