@@ -309,7 +309,7 @@ def align(
             print("Failed to align segment: original start time longer than audio duration, skipping...")
             continue
         if t2 - t1 < 0.02:
-            print("Failed to align segment: duration smaller than 0.02s time precision")
+            segment['word-level'] = [{"text": segment['text'].strip(), "start": t1, "end": t2}]
             continue
 
         f1 = int(t1 * SAMPLE_RATE)
@@ -382,9 +382,7 @@ def align(
         else:
             fail_fallback = True
 
-        if fail_fallback:
-            prev_t2 = 0
-            segment['word-level'] = []
+        if fail_fallback: prev_t2 = 0
 
     return transcript
 
