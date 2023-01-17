@@ -384,8 +384,9 @@ def align(
 
         if fail_fallback:
             prev_t2 = 0
+            segment['word-level'] = []
 
-    return {"segments": transcript}
+    return transcript
 
 def load_align_model(language_code, device, model_name=None):
     if model_name is None:
